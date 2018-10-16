@@ -2,6 +2,9 @@
 
 package lesson1
 
+import java.io.File
+import java.util.*
+
 /**
  * Сортировка времён
  *
@@ -94,8 +97,31 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
+
+/**
+ * Заполнение массива-счетчика имеет сложность O(N), запись в новый файл по счетчику так же имеет сложность O(N),
+ * сложность решения - O(N).
+ * Разность температур задана, поэтому размер массива-счетчика всегда одинаковый - затраты памяти O(1).
+ */
+
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val min = -2730
+    val max = 5000
+
+    val counter = IntArray(max - min + 1)
+    for (line in File(inputName).readLines()) {
+        val temperature = line.toDouble();
+        counter[(temperature * 10).toInt() - min]++
+    }
+    File(outputName).bufferedWriter().use {
+        for (i in 0 until counter.size) {
+            while (counter[i] > 0) {
+                it.write(((i + min) / 10.0).toString())
+                counter[i]--
+                it.newLine()
+            }
+        }
+    }
 }
 
 /**
@@ -127,8 +153,37 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
+
+/**
+ * Заполнение словаря-счетчика имеет сложность O(N), вставка в дерево и поиск самого большого значения имеет
+ * сложность O(M), связанную с количеством различных чисел в последовательности,
+ * запись в новый файл имеет сложность O(N).
+ * Затраты памяти на словарь зависят от количества различных чисел в последовательности - O(M).
+ */
+
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    val counter = TreeMap<Int, Int>()
+    for (line in File(inputName).readLines()) {
+        val num = line.toInt()
+        if (counter.contains(num)) {
+            val count = counter[num]!! + 1
+            counter[num] = count;
+        } else counter[num] = 1
+    }
+    val min = counter.entries.maxBy { it.value }!!.key
+    val maxCount = counter[min]!!
+    File(outputName).bufferedWriter().use {
+        for (line in File(inputName).readLines()) {
+            if (line.toInt() != min) {
+                it.write(line)
+                it.newLine()
+            }
+        }
+        for (i in maxCount downTo 1) {
+            it.write(min.toString())
+            it.newLine()
+        }
+    }
 }
 
 /**

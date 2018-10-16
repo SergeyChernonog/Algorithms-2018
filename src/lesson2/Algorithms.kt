@@ -2,6 +2,7 @@
 
 package lesson2
 
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -91,9 +92,34 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
  */
+
+/**
+ * Алгоритм проходит по всем буквам каждого слова - сложность O(M*N), для хранения информации используется матрица
+ * совпадений букв размером O(M*N)
+ */
+
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    val firstLen = first.length;
+    val secondLen = second.length;
+    var max = 0;
+    var index = -1;
+    val matrix = Matrix<Int>(firstLen, secondLen, 0);
+    for (i in 0 until firstLen) {
+        for (j in 0 until secondLen) {
+            if (first[i] == second[j]) {
+                matrix[i, j] = 1
+                if (i != 0 && j != 0) matrix[i, j] += matrix[i - 1, j - 1]
+            }
+            if (matrix[i, j] > max) {
+                max = matrix[i, j]
+                index = i
+            }
+        }
+    }
+    return if (max == 0) ""
+    else return first.substring(index - max + 1, index + 1)
 }
+
 
 /**
  * Число простых чисел в интервале
@@ -138,3 +164,47 @@ fun calcPrimesNumber(limit: Int): Int {
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
     TODO()
 }
+
+
+class Matrix<E>(private var height: Int, private var width: Int, val e: E) {
+    private val container = MutableList(height) { MutableList(width) { e } }
+
+    fun getHeight() = height;
+    fun getWidth() = width;
+
+    fun isInside(row: Int, column: Int) = row in 0 until height && column in 0 until width
+
+    operator fun get(row: Int, column: Int): E {
+        if (!isInside(row, column)) throw IllegalArgumentException()
+        return container[row][column]
+    }
+
+
+    operator fun get(cell: Cell): E = get(cell.row, cell.column)
+
+
+    operator fun set(row: Int, column: Int, value: E) {
+        if (!isInside(row, column)) throw IllegalArgumentException()
+        container[row][column] = value
+    }
+
+    operator fun set(cell: Cell, value: E) = set(cell.row, cell.column, value)
+
+
+    override fun toString(): String {
+        val string = StringBuilder()
+        for (i in 0 until height) {
+            string.append("|")
+            string.append(" ")
+            for (j in 0 until width) {
+                string.append(container[i][j].toString())
+                string.append(" ")
+            }
+            string.append("|")
+            string.append("\n")
+        }
+        return string.toString()
+    }
+}
+
+data class Cell(val row: Int, val column: Int)

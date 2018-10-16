@@ -28,6 +28,7 @@ class TaskTestsJava : AbstractTaskTests() {
     @Tag("Normal")
     fun testSortSequence() {
         sortSequence { inputName, outputName -> JavaTasks.sortSequence(inputName, outputName) }
+
     }
 
     @Test
