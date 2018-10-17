@@ -33,9 +33,31 @@ import java.util.*
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
+/**
+ * Чтение файла и запись в счетчик имеет сложность O(N), запись имеет сложность O(N). Сложность решения - O(N).
+ * Затраты памяти на счетчик O(1).
+ */
+
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val max = 24 * 60 * 60
+    val counter = IntArray(max)
+    File(inputName).readLines().forEach { counter[it.toSeconds()]++ }
+    File(outputName).bufferedWriter().use {
+        for (i in 0 until max) {
+            while (counter[i] > 0) {
+                it.write(i.toTimeFormat())
+                it.newLine()
+                counter[i]--
+            }
+        }
+    }
 }
+
+fun String.toSeconds() = this.split(":").map { it.toInt() }
+        .fold(0) { prev, next -> prev * 60 + next }
+
+fun Int.toTimeFormat() = String.format(String.format("%02d:%02d:%02d", this / 3600, (this % 3600) / 60, this % 60))
 
 /**
  * Сортировка адресов
@@ -99,9 +121,9 @@ fun sortAddresses(inputName: String, outputName: String) {
  */
 
 /**
- * Заполнение массива-счетчика имеет сложность O(N), запись в новый файл по счетчику так же имеет сложность O(N),
+ * Заполнение массива-счетчика имеет сложность O(N), запись в новый файл имеет сложность O(N),
  * сложность решения - O(N).
- * Разность температур задана, поэтому размер массива-счетчика всегда одинаковый - затраты памяти O(1).
+ * Разность температур задана, поэтому затраты памяти на массив-счетчик O(1).
  */
 
 fun sortTemperatures(inputName: String, outputName: String) {
@@ -109,10 +131,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
     val max = 5000
 
     val counter = IntArray(max - min + 1)
-    for (line in File(inputName).readLines()) {
-        val temperature = line.toDouble();
-        counter[(temperature * 10).toInt() - min]++
-    }
+    File(inputName).readLines().forEach { counter[(it.toDouble() * 10).toInt() - min]++ }
     File(outputName).bufferedWriter().use {
         for (i in 0 until counter.size) {
             while (counter[i] > 0) {
@@ -155,14 +174,14 @@ fun sortTemperatures(inputName: String, outputName: String) {
  */
 
 /**
- * Заполнение словаря-счетчика имеет сложность O(N), вставка в дерево и поиск самого большого значения имеет
- * сложность O(M), связанную с количеством различных чисел в последовательности,
- * запись в новый файл имеет сложность O(N).
+ * Заполнение словаря-счетчика имеет сложность O(N), вставка в словарь имеет сложность O(1), поиск самого большого
+ * значения имеет сложность O(M), M - количество различных элементов в последовательности.
+ * Запись в новый файл имеет сложность O(N).
  * Затраты памяти на словарь зависят от количества различных чисел в последовательности - O(M).
  */
 
 fun sortSequence(inputName: String, outputName: String) {
-    val counter = TreeMap<Int, Int>()
+    val counter = mutableMapOf<Int, Int>()
     for (line in File(inputName).readLines()) {
         val num = line.toInt()
         if (counter.contains(num)) {
@@ -170,17 +189,17 @@ fun sortSequence(inputName: String, outputName: String) {
             counter[num] = count;
         } else counter[num] = 1
     }
-    val min = counter.entries.maxBy { it.value }!!.key
-    val maxCount = counter[min]!!
+    val minElement = counter.entries.maxBy { it.value }!!.key
+    val maxCount = counter[minElement]!!
     File(outputName).bufferedWriter().use {
         for (line in File(inputName).readLines()) {
-            if (line.toInt() != min) {
+            if (line.toInt() != minElement) {
                 it.write(line)
                 it.newLine()
             }
         }
         for (i in maxCount downTo 1) {
-            it.write(min.toString())
+            it.write(minElement.toString())
             it.newLine()
         }
     }

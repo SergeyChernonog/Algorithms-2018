@@ -117,7 +117,7 @@ fun longestCommonSubstring(first: String, second: String): String {
         }
     }
     return if (max == 0) ""
-    else return first.substring(index - max + 1, index + 1)
+    else first.substring(index - max + 1, index + 1)
 }
 
 
