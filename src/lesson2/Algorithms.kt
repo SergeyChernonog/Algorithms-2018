@@ -77,9 +77,17 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  * Х   Х
  * Х х Х
  */
+
+/**
+ * сложность O(N), затраты памяти O(1)
+ */
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
-    TODO()
+    var res = 0
+    for (i in 1..menNumber)
+        res = (res + choiceInterval) % i
+    return res + 1
 }
+
 
 /**
  * Наибольшая общая подстрока.
