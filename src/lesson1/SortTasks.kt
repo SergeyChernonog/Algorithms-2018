@@ -131,14 +131,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
     val max = 5000
 
     val counter = IntArray(max - min + 1)
-    File(inputName).bufferedReader().use {
-        var line = it.readLine()
-        while (line != null) {
-            counter[(line.toDouble() * 10).toInt() - min]++
-            line = it.readLine()
-        }
-
-    }
+    File(inputName).forEachLine { counter[(it.toDouble() * 10).toInt() - min]++ }
     File(outputName).bufferedWriter().use {
         for (i in 0 until counter.size) {
             while (counter[i] > 0) {
@@ -189,8 +182,8 @@ fun sortTemperatures(inputName: String, outputName: String) {
 
 fun sortSequence(inputName: String, outputName: String) {
     val counter = mutableMapOf<Int, Int>()
-    for (line in File(inputName).readLines()) {
-        val num = line.toInt()
+    File(inputName).forEachLine {
+        val num = it.toInt()
         if (counter.contains(num)) {
             val count = counter[num]!! + 1
             counter[num] = count;
