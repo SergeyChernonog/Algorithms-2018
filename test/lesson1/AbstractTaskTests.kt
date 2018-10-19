@@ -39,6 +39,20 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
+
+        // новый тест
+        try {
+            sortTimes("input/time_in_task.txt", "temp.txt")
+            assertFileContent("temp.txt",
+                    """
+                        00:00:00
+                        12:00:23
+                        23:59:59
+                    """.trimIndent())
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
@@ -99,6 +113,19 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             File("temp.txt").delete()
         }
 
+
+        // новый тест
+        try {
+            sortTemperatures("input/temp_in_task.txt", "temp.txt")
+            assertFileContent("temp.txt",
+                    """
+                    0.0
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
+
         fun testGeneratedTemperatures(size: Int) {
             try {
                 generateTemperatures(size)
@@ -118,6 +145,15 @@ abstract class AbstractTaskTests : AbstractFileTests() {
 
     protected fun sortSequence(sortSequence: (String, String) -> Unit) {
         // TODO: large test
+
+        // новый тест. большой
+        try {
+            sortSequence("input/seq_in_large_task.txt", "temp.txt")
+            assertBigFiles("temp.txt", "input/seq_out_large_task.txt")
+        } finally {
+            File("temp.txt").delete()
+        }
+
         try {
             sortSequence("input/seq_in1.txt", "temp.txt")
             assertFileContent("temp.txt",
@@ -133,6 +169,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
         try {
             sortSequence("input/seq_in2.txt", "temp.txt")
             assertFileContent("temp.txt",

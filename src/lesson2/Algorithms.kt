@@ -81,11 +81,12 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
 /**
  * сложность O(N), затраты памяти O(1)
  */
-fun josephTask(menNumber: Int, choiceInterval: Int): Int {
-    var res = 0
-    for (i in 1..menNumber)
-        res = (res + choiceInterval) % i
-    return res + 1
+
+fun josephTask(menNumber: Int, choiceInterval: Int): Int = recursiveJoseph(menNumber, choiceInterval, 1, 0)
+
+tailrec fun recursiveJoseph(menNumber: Int, choiceInterval: Int, i: Int, res: Int): Int {
+    return if (menNumber == 1) res + 1
+    else recursiveJoseph(menNumber - 1, choiceInterval, i + 1, (res + choiceInterval) % (i + 1))
 }
 
 
@@ -107,19 +108,19 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  */
 
 fun longestCommonSubstring(first: String, second: String): String {
-    val firstLen = first.length;
-    val secondLen = second.length;
-    var max = 0;
-    var index = -1;
-    val matrix = Matrix<Int>(firstLen, secondLen, 0);
+    val firstLen = first.length
+    val secondLen = second.length
+    var max = 0
+    var index = -1
+    val container = MutableList(firstLen) { MutableList(secondLen) { 0 } }
     for (i in 0 until firstLen) {
         for (j in 0 until secondLen) {
             if (first[i] == second[j]) {
-                matrix[i, j] = 1
-                if (i != 0 && j != 0) matrix[i, j] += matrix[i - 1, j - 1]
+                container[i][j] = 1
+                if (i != 0 && j != 0) container[i][j] += container[i-1][j-1]
             }
-            if (matrix[i, j] > max) {
-                max = matrix[i, j]
+            if (container[i][j] > max) {
+                max = container[i][j]
                 index = i
             }
         }
@@ -173,46 +174,3 @@ fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
     TODO()
 }
 
-
-class Matrix<E>(private var height: Int, private var width: Int, val e: E) {
-    private val container = MutableList(height) { MutableList(width) { e } }
-
-    fun getHeight() = height;
-    fun getWidth() = width;
-
-    fun isInside(row: Int, column: Int) = row in 0 until height && column in 0 until width
-
-    operator fun get(row: Int, column: Int): E {
-        if (!isInside(row, column)) throw IllegalArgumentException()
-        return container[row][column]
-    }
-
-
-    operator fun get(cell: Cell): E = get(cell.row, cell.column)
-
-
-    operator fun set(row: Int, column: Int, value: E) {
-        if (!isInside(row, column)) throw IllegalArgumentException()
-        container[row][column] = value
-    }
-
-    operator fun set(cell: Cell, value: E) = set(cell.row, cell.column, value)
-
-
-    override fun toString(): String {
-        val string = StringBuilder()
-        for (i in 0 until height) {
-            string.append("|")
-            string.append(" ")
-            for (j in 0 until width) {
-                string.append(container[i][j].toString())
-                string.append(" ")
-            }
-            string.append("|")
-            string.append("\n")
-        }
-        return string.toString()
-    }
-}
-
-data class Cell(val row: Int, val column: Int)

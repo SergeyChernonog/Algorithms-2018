@@ -3,6 +3,7 @@
 package lesson1
 
 import java.io.File
+import java.lang.IllegalArgumentException
 import java.util.*
 
 /**
@@ -180,17 +181,15 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * Затраты памяти на словарь зависят от количества различных чисел в последовательности - O(M).
  */
 
+
 fun sortSequence(inputName: String, outputName: String) {
     val counter = mutableMapOf<Int, Int>()
     File(inputName).forEachLine {
         val num = it.toInt()
-        if (counter.contains(num)) {
-            val count = counter[num]!! + 1
-            counter[num] = count;
-        } else counter[num] = 1
+        counter[num] = counter.getOrDefault(num, 0) + 1
     }
-    val minElement = counter.entries.maxBy { it.value }!!.key
-    val maxCount = counter[minElement]!!
+    if (counter.isEmpty()) throw IllegalArgumentException("File was empty")
+    val (minElement, maxCount) = counter.entries.maxBy { it.value }!!
     File(outputName).bufferedWriter().use {
         for (line in File(inputName).readLines()) {
             if (line.toInt() != minElement) {
