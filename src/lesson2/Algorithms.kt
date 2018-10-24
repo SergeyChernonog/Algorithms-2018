@@ -2,6 +2,11 @@
 
 package lesson2
 
+import lesson3.Trie
+import java.io.File
+import java.lang.IllegalArgumentException
+import java.util.*
+
 
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
@@ -117,7 +122,7 @@ fun longestCommonSubstring(first: String, second: String): String {
         for (j in 0 until secondLen) {
             if (first[i] == second[j]) {
                 container[i][j] = 1
-                if (i != 0 && j != 0) container[i][j] += container[i-1][j-1]
+                if (i != 0 && j != 0) container[i][j] += container[i - 1][j - 1]
             }
             if (container[i][j] > max) {
                 max = container[i][j]
@@ -170,7 +175,60 @@ fun calcPrimesNumber(limit: Int): Int {
  * В файле буквы разделены пробелами, строки -- переносами строк.
  * Остальные символы ни в файле, ни в словах не допускаются.
  */
+
+/**
+ *
+ */
+
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
-    TODO()
+    val dictionary = Trie()
+    dictionary.addAll(words)
+
+    val regex = Regex("""[А-ЯЁA-Z ]+""")
+
+    val field = mutableListOf<List<Char>>()
+    File(inputName).forEachLine { line ->
+        if (!line.matches(regex)) throw IllegalArgumentException("Wrong format")
+        field.add(line.split(" ").map { it.first() })
+    }
+
+    return field.findWords(dictionary)
 }
 
+
+fun List<List<Char>>.findWords(dictionary: Trie): Set<String> {
+    val result = mutableSetOf<String>()
+    for (i in 0 until this.size) {
+        for (j in 0 until this.first().size) {
+            result.addAll(this.search(dictionary, Cell(i, j), "", listOf()))
+        }
+    }
+    return result
+}
+
+fun List<List<Char>>.search(dictionary: Trie, searchPoint: Cell, word: String, checked: List<Cell>): Set<String> {
+    val result = mutableSetOf<String>()
+
+    if (searchPoint !in checked) {
+        val prefix = word + this[searchPoint.row][searchPoint.column]
+        val checkedList = checked + searchPoint
+
+        if (dictionary.containsPref(prefix)) {
+            if (dictionary.contains(prefix)) result.add(prefix)
+            this.getNeighbours(searchPoint).forEach { result.addAll(this.search(dictionary, it, prefix, checkedList)) }
+        }
+    }
+    return result
+}
+
+fun List<List<Char>>.getNeighbours(cell: Cell): List<Cell> {
+    val (row, column) = cell
+    val result = mutableListOf<Cell>()
+    if (row + 1 < this.size) result.add(Cell(row + 1, column))
+    if (row - 1 >= 0) result.add(Cell(row - 1, column))
+    if (column + 1 < this.first().size) result.add(Cell(row, column + 1))
+    if (column - 1 >= 0) result.add(Cell(row, column - 1))
+    return result
+}
+
+data class Cell(val row: Int, val column: Int)
