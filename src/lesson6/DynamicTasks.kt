@@ -2,6 +2,9 @@
 
 package lesson6
 
+import java.io.File
+import java.lang.StringBuilder
+
 /**
  * Наибольшая общая подпоследовательность.
  * Средняя
@@ -13,9 +16,44 @@ package lesson6
  * Если общей подпоследовательности нет, вернуть пустую строку.
  * При сравнении подстрок, регистр символов *имеет* значение.
  */
+
+/**
+ * Алгоритм проходит по всем буквам каждого слова- сложность O(M*N), для хранения информации используется матрица
+ * размера O(M*N)
+ */
+
 fun longestCommonSubSequence(first: String, second: String): String {
-    TODO()
+
+    val matrix = createCountMatrix(first, second);
+    val res = StringBuilder()
+    var i = first.length
+    var j = second.length
+
+    while (i > 0 && j > 0) {
+        when {
+            first[i - 1] == second[j - 1] -> {
+                res.append(first[i - 1])
+                i--
+                j--
+            }
+            matrix[i - 1][j] > matrix[i][j - 1] -> i--
+            else -> j--
+        }
+    }
+    return res.reverse().toString()
 }
+
+fun createCountMatrix(first: String, second: String): Array<IntArray> {
+    val matrix = Array(first.length + 1) { IntArray(second.length + 1) }
+    for (i in 1 until matrix.size) {
+        for (j in 1 until matrix.first().size) {
+            matrix[i][j] = if (first[i - 1] == second[j - 1]) matrix[i - 1][j - 1] + 1
+            else maxOf(matrix[i - 1][j], matrix[i][j - 1])
+        }
+    }
+    return matrix
+}
+
 
 /**
  * Наибольшая возрастающая подпоследовательность
@@ -53,9 +91,32 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
  *
  * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
  */
+
+
+/**
+ * Алгоритм проходит по каждой ячейке - сложность O(M*N), где M*N - колличество клеток
+ * Для хранения поля и подсчета пути используется матрица размера O(M*N)
+ */
 fun shortestPathOnField(inputName: String): Int {
-    TODO()
+    val fieldMatrix = mutableListOf<MutableList<Int>>()
+    File(inputName).forEachLine { line -> fieldMatrix.add(line.split(" ").map { it.toInt() }.toMutableList()) }
+
+    for (i in 0 until fieldMatrix.size) {
+        for (j in 0 until fieldMatrix.first().size) {
+            fieldMatrix[i][j] = fieldMatrix[i][j] + fieldMatrix.getMinFromNeighbours(i, j)
+        }
+    }
+    return fieldMatrix.last().last()
 }
+
+fun MutableList<MutableList<Int>>.getMinFromNeighbours(i: Int, j: Int) =
+        when {
+            i == 0 && j == 0 -> 0
+            i == 0 -> this[i][j - 1]
+            j == 0 -> this[i - 1][j]
+            else -> minOf(this[i - 1][j], this[i][j - 1], this[i - 1][j - 1])
+        }
+
 
 // Задачу "Максимальное независимое множество вершин в графе без циклов"
 // смотрите в уроке 5

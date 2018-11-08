@@ -2,6 +2,10 @@
 
 package lesson5
 
+import lesson5.impl.GraphBuilder
+import java.util.*
+import kotlin.collections.HashMap
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -60,9 +64,39 @@ fun Graph.findEulerLoop(): List<Graph.Edge> {
  * |
  * J ------------ K
  */
+
+/**
+ * Используется алгоритм Краскала - выполняется Е итераций алгоритма, где E - количество ребер.
+ * Затраты памяти для хранения нового графа - O(E + V), где V - количество вершин.
+ * Для проверки нового графа на цикличность используется поиск в ширину сложность - O(E + V),
+ * затраты памяти для хранения очереди вершин и списка посещенных - O(E + V).
+ */
 fun Graph.minimumSpanningTree(): Graph {
-    TODO()
+
+    if (shortestPath(vertices.first()).any { it.value.distance == Int.MAX_VALUE }) return GraphBuilder().build()
+
+    return GraphBuilder().apply {
+        addVertices(vertices)
+        edges.forEach {
+            addConnection(it)
+            if (build().haveCycle()) removeConnection(it)
+        }
+    }.build()
 }
+
+fun Graph.haveCycle(): Boolean {
+    val queue = ArrayDeque<Pair<Graph.Vertex, Graph.Vertex?>>() // пара из текущей и предыдущей вершин
+    val visited = mutableListOf<Graph.Vertex>()
+    queue.add(Pair(this.vertices.first(), null))
+    while (queue.isNotEmpty()) {
+        val (current, prev) = queue.poll()
+        if (current in visited) return true
+        this.getNeighbors(current).filter { it != prev }.forEach { queue.add(Pair(it, current)) }
+        visited.add(current)
+    }
+    return false
+}
+
 
 /**
  * Максимальное независимое множество вершин в графе без циклов.
@@ -89,8 +123,22 @@ fun Graph.minimumSpanningTree(): Graph {
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
 fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
-    TODO()
+    val root = this.vertices.first()
+    val storage = hashMapOf<Graph.Vertex, Set<Graph.Vertex>>()
+    val parents = hashMapOf<Graph.Vertex, Graph.Vertex?>(root to null)
+    return independentSetForVertex(storage, root, parents)
 }
+
+fun Graph.independentSetForVertex(storage: MutableMap<Graph.Vertex, Set<Graph.Vertex>>,
+                                  vertex: Graph.Vertex, parents: Map<Graph.Vertex,
+                Graph.Vertex?>): Set<Graph.Vertex> {
+
+    val children = this.getNeighbors(vertex)
+
+
+    return emptySet()
+}
+
 
 /**
  * Наидлиннейший простой путь.

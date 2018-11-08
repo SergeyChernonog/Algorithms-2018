@@ -68,6 +68,29 @@ abstract class AbstractGraphTests {
     }
 
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {
+
+        //новые тесты
+        val graphForSmallTest = GraphBuilder().apply {
+            val a = addVertex("A")
+        }.build()
+        val treeForSmallTest = graphForSmallTest.minimumSpanningTree();
+        assertEquals(0, treeForSmallTest.edges.size)
+
+        val vertexAmount = 200
+        val graphForBigTest = GraphBuilder().apply {
+            val vertices = Array<Graph.Vertex?>(vertexAmount) { null }
+            for (i in 0 until vertexAmount) {
+                vertices[i] = addVertex(i.toString())
+            }
+            for (i in 0 until vertices.size) {
+                for (j in i + 1 until vertices.size)
+                    addConnection(vertices[i]!!, vertices[j]!!)
+            }
+        }.build()
+        val bigTree = graphForBigTest.minimumSpanningTree();
+        assertEquals(vertexAmount - 1, bigTree.edges.size)
+
+
         val graph = GraphBuilder().apply {
             val a = addVertex("A")
             val b = addVertex("B")

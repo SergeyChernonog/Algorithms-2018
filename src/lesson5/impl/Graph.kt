@@ -3,6 +3,7 @@ package lesson5.impl
 import lesson5.Graph.Edge
 import lesson5.Graph
 import lesson5.Graph.Vertex
+import java.util.*
 
 class GraphBuilder {
 
@@ -24,7 +25,7 @@ class GraphBuilder {
 
     private val vertices = mutableMapOf<String, Vertex>()
 
-    private val connections = mutableMapOf<Vertex, Set<EdgeImpl>>()
+    private val connections = mutableMapOf<Vertex, Set<Edge>>()//set<EdgeImpl>
 
     private fun addVertex(v: Vertex) {
         vertices[v.name] = v
@@ -40,6 +41,22 @@ class GraphBuilder {
         val edge = EdgeImpl(weight, begin, end)
         connections[begin] = connections[begin]?.let { it + edge } ?: setOf(edge)
         connections[end] = connections[end]?.let { it + edge } ?: setOf(edge)
+    }
+
+    //
+    fun addConnection(edge: Edge) {
+        addConnection(edge.begin, edge.end)
+    }
+
+    //
+    fun removeConnection(edge: Edge) {
+        if (edge.begin in connections.keys) connections[edge.begin] = connections[edge.begin]!! - edge
+        if (edge.end in connections.keys) connections[edge.end] = connections[edge.end]!! - edge
+    }
+
+    //
+    fun addVertices(vertices: Collection<Vertex>) {
+        vertices.forEach { addVertex(it) }
     }
 
     fun build(): Graph = object : Graph {

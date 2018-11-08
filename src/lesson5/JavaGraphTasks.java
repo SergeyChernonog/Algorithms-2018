@@ -2,6 +2,8 @@ package lesson5;
 
 import kotlin.NotImplementedError;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
