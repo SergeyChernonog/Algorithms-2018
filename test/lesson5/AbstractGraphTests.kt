@@ -70,11 +70,25 @@ abstract class AbstractGraphTests {
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {
 
         //новые тесты
-        val graphForSmallTest = GraphBuilder().apply {
-            val a = addVertex("A")
-        }.build()
-        val treeForSmallTest = graphForSmallTest.minimumSpanningTree();
+//        val graphWith = GraphBuilder().apply {
+//            val a = addVertex("A")
+//            val b = addVertex("B")
+//            val c = addVertex("C")
+//            val d = addVertex("D")
+//            addConnection(a, b)
+//            addConnection(c, d)
+//        }.build()
+//        val tr = graphWith.minimumSpanningTree()
+//        println(tr.edges)
+//        assertEquals(3, tr.edges.size)
+
+        val graphForSmallTest = GraphBuilder().apply { addVertex("A") }.build()
+        val treeForSmallTest = graphForSmallTest.minimumSpanningTree()
         assertEquals(0, treeForSmallTest.edges.size)
+
+        val emptyGraph = GraphBuilder().build()
+        val emptyTree = emptyGraph.minimumSpanningTree()
+        assertEquals(0, emptyTree.edges.size)
 
         val vertexAmount = 200
         val graphForBigTest = GraphBuilder().apply {
@@ -87,8 +101,9 @@ abstract class AbstractGraphTests {
                     addConnection(vertices[i]!!, vertices[j]!!)
             }
         }.build()
-        val bigTree = graphForBigTest.minimumSpanningTree();
+        val bigTree = graphForBigTest.minimumSpanningTree()
         assertEquals(vertexAmount - 1, bigTree.edges.size)
+        assertEquals(vertexAmount - 1, bigTree.findBridges().size)
 
 
         val graph = GraphBuilder().apply {
@@ -134,6 +149,22 @@ abstract class AbstractGraphTests {
     }
 
     fun largestIndependentVertexSet(largestIndependentVertexSet: Graph.() -> Set<Graph.Vertex>) {
+        // новые тесты
+        val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
+        val smallIndependent = smallGraph.largestIndependentVertexSet()
+        assertEquals(setOf(smallGraph["A"]), smallIndependent)
+
+        val emptyGraph = GraphBuilder().build()
+        val emptyIndependent = emptyGraph.largestIndependentVertexSet()
+        assertEquals(emptySet(), emptyIndependent)
+
+//        val vertexAmount = 100
+//        val bigGraph = GraphBuilder().apply {
+//            for (i in 0 until 100 step 10)
+//
+//        }
+
+
         val graph = GraphBuilder().apply {
             val a = addVertex("A")
             val b = addVertex("B")

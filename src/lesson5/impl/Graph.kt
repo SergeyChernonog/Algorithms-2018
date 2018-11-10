@@ -45,7 +45,10 @@ class GraphBuilder {
 
     //
     fun addConnection(edge: Edge) {
-        addConnection(edge.begin, edge.end)
+        val begin = edge.begin
+        val end = edge.end
+        connections[begin] = connections[begin]?.let { it + edge } ?: setOf(edge)
+        connections[end] = connections[end]?.let { it + edge } ?: setOf(edge)
     }
 
     //

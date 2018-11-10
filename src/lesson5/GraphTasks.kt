@@ -4,7 +4,6 @@ package lesson5
 
 import lesson5.impl.GraphBuilder
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * Эйлеров цикл.
@@ -72,8 +71,9 @@ fun Graph.findEulerLoop(): List<Graph.Edge> {
  * затраты памяти для хранения очереди вершин и списка посещенных - O(E + V).
  */
 fun Graph.minimumSpanningTree(): Graph {
-
-    if (shortestPath(vertices.first()).any { it.value.distance == Int.MAX_VALUE }) return GraphBuilder().build()
+    if (this.vertices.isEmpty())
+    //  || shortestPath(vertices.first()).any { it.value.distance == Int.MAX_VALUE })
+        return GraphBuilder().build()
 
     return GraphBuilder().apply {
         addVertices(vertices)
@@ -81,6 +81,15 @@ fun Graph.minimumSpanningTree(): Graph {
             addConnection(it)
             if (build().haveCycle()) removeConnection(it)
         }
+
+        // если граф имеет больше 1 компоненты связности
+//        val start = vertices.first()
+//        for (vertex in vertices) {
+//            if (build().shortestPath(start)[vertex]!!.distance == Int.MAX_VALUE) {
+//                addConnection(start, vertex)
+//                break
+//            }
+//        }
     }.build()
 }
 
@@ -122,21 +131,30 @@ fun Graph.haveCycle(): Boolean {
  *
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
+
+/**
+ * Сложность решения - O(E + V). Затраты памяти на словарь-хранилище промежуточных результатов - O(V^2)
+ */
+
 fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
-    val root = this.vertices.first()
+    val root = this.vertices.firstOrNull() ?: return emptySet()
     val storage = hashMapOf<Graph.Vertex, Set<Graph.Vertex>>()
-    val parents = hashMapOf<Graph.Vertex, Graph.Vertex?>(root to null)
-    return independentSetForVertex(storage, root, parents)
+    return setForVertex(storage, root, null)
 }
 
-fun Graph.independentSetForVertex(storage: MutableMap<Graph.Vertex, Set<Graph.Vertex>>,
-                                  vertex: Graph.Vertex, parents: Map<Graph.Vertex,
-                Graph.Vertex?>): Set<Graph.Vertex> {
+fun Graph.setForVertex(storage: MutableMap<Graph.Vertex, Set<Graph.Vertex>>,
+                       vertex: Graph.Vertex, parent: Graph.Vertex?): Set<Graph.Vertex> {
+    return storage.getOrPut(vertex) {
+        val children = getNeighbors(vertex).filter { it != parent }
+        val childrenSet = children.flatMap { setForVertex(storage, it, vertex) }.toSet()
+        val grandChildrenSet = children.flatMap { child ->
+            getNeighbors(child).filter { it != vertex }
+                    .flatMap { grandChild -> (setForVertex(storage, grandChild, child)) }
+        }.toSet()
 
-    val children = this.getNeighbors(vertex)
-
-
-    return emptySet()
+        if (childrenSet.size > grandChildrenSet.size + 1) childrenSet
+        else grandChildrenSet + vertex
+    }
 }
 
 
