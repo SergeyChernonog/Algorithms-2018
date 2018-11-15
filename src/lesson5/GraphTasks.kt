@@ -71,8 +71,7 @@ fun Graph.findEulerLoop(): List<Graph.Edge> {
  * затраты памяти для хранения очереди вершин и списка посещенных - O(E + V).
  */
 fun Graph.minimumSpanningTree(): Graph {
-    if (this.vertices.isEmpty())
-    //  || shortestPath(vertices.first()).any { it.value.distance == Int.MAX_VALUE })
+    if (this.vertices.isEmpty() || shortestPath(vertices.first()).any { it.value.distance == Int.MAX_VALUE })
         return GraphBuilder().build()
 
     return GraphBuilder().apply {
@@ -100,7 +99,7 @@ fun Graph.haveCycle(): Boolean {
     while (queue.isNotEmpty()) {
         val (current, prev) = queue.poll()
         if (current in visited) return true
-        this.getNeighbors(current).filter { it != prev }.forEach { queue.add(Pair(it, current)) }
+        this.getNeighbors(current).forEach { if (it != prev) queue.add(Pair(it, current)) }
         visited.add(current)
     }
     return false
@@ -137,19 +136,22 @@ fun Graph.haveCycle(): Boolean {
  */
 
 fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
-    val root = this.vertices.firstOrNull() ?: return emptySet()
+    if (this.vertices.isEmpty()) return emptySet()
+    val root = this.vertices.first()
     val storage = hashMapOf<Graph.Vertex, Set<Graph.Vertex>>()
     return setForVertex(storage, root, null)
 }
 
 fun Graph.setForVertex(storage: MutableMap<Graph.Vertex, Set<Graph.Vertex>>,
-                       vertex: Graph.Vertex, parent: Graph.Vertex?): Set<Graph.Vertex> {
+                       vertex: Graph.Vertex,
+                       parent: Graph.Vertex?
+): Set<Graph.Vertex> {
     return storage.getOrPut(vertex) {
-        val children = getNeighbors(vertex).filter { it != parent }
-        val childrenSet = children.flatMap { setForVertex(storage, it, vertex) }.toSet()
+        val children = this.getNeighbors(vertex).filter { it != parent }
+        val childrenSet = children.flatMap { this.setForVertex(storage, it, vertex) }.toSet()
         val grandChildrenSet = children.flatMap { child ->
-            getNeighbors(child).filter { it != vertex }
-                    .flatMap { grandChild -> (setForVertex(storage, grandChild, child)) }
+            this.getNeighbors(child).filter { it != vertex }
+                    .flatMap { grandChild -> (this.setForVertex(storage, grandChild, child)) }
         }.toSet()
 
         if (childrenSet.size > grandChildrenSet.size + 1) childrenSet
@@ -178,6 +180,22 @@ fun Graph.setForVertex(storage: MutableMap<Graph.Vertex, Set<Graph.Vertex>>,
  *
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
  */
+
+
 fun Graph.longestSimplePath(): Path {
-    TODO()
+    var best = Path(this.vertices.first())
+    var length = -1
+    val stack = ArrayDeque<Path>()
+    stack.addAll(this.vertices.map { Path(it) })
+    while (stack.isNotEmpty()) {
+        val current = stack.pop()
+        if (current.length > length) {
+            best = current
+            length = current.length
+            if (current.vertices.size == this.vertices.size) break
+        }
+        this.getNeighbors(current.vertices.last())
+                .filter { it !in current }.map { Path(current, this, it) }.forEach { stack.push(it) }
+    }
+    return best
 }

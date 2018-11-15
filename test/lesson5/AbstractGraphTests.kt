@@ -1,6 +1,7 @@
 package lesson5
 
 import lesson5.impl.GraphBuilder
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -70,28 +71,27 @@ abstract class AbstractGraphTests {
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {
 
         //новые тесты
-//        val graphWith = GraphBuilder().apply {
-//            val a = addVertex("A")
-//            val b = addVertex("B")
-//            val c = addVertex("C")
-//            val d = addVertex("D")
-//            addConnection(a, b)
-//            addConnection(c, d)
-//        }.build()
-//        val tr = graphWith.minimumSpanningTree()
-//        println(tr.edges)
-//        assertEquals(3, tr.edges.size)
+        val disconnectedGraph = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            addConnection(a, b)
+            addConnection(c, d)
+        }.build()
+        val treeOfDisconnected = disconnectedGraph.minimumSpanningTree()
+        assertEquals(0, treeOfDisconnected.edges.size)
 
-        val graphForSmallTest = GraphBuilder().apply { addVertex("A") }.build()
-        val treeForSmallTest = graphForSmallTest.minimumSpanningTree()
-        assertEquals(0, treeForSmallTest.edges.size)
+        val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
+        val smallTree = smallGraph.minimumSpanningTree()
+        assertEquals(0, smallTree.edges.size)
 
         val emptyGraph = GraphBuilder().build()
         val emptyTree = emptyGraph.minimumSpanningTree()
         assertEquals(0, emptyTree.edges.size)
 
         val vertexAmount = 200
-        val graphForBigTest = GraphBuilder().apply {
+        val bigCompleteGraph = GraphBuilder().apply {
             val vertices = Array<Graph.Vertex?>(vertexAmount) { null }
             for (i in 0 until vertexAmount) {
                 vertices[i] = addVertex(i.toString())
@@ -101,7 +101,7 @@ abstract class AbstractGraphTests {
                     addConnection(vertices[i]!!, vertices[j]!!)
             }
         }.build()
-        val bigTree = graphForBigTest.minimumSpanningTree()
+        val bigTree = bigCompleteGraph.minimumSpanningTree()
         assertEquals(vertexAmount - 1, bigTree.edges.size)
         assertEquals(vertexAmount - 1, bigTree.findBridges().size)
 
@@ -148,6 +148,7 @@ abstract class AbstractGraphTests {
         assertEquals(10, tree2.findBridges().size)
     }
 
+
     fun largestIndependentVertexSet(largestIndependentVertexSet: Graph.() -> Set<Graph.Vertex>) {
         // новые тесты
         val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
@@ -158,11 +159,23 @@ abstract class AbstractGraphTests {
         val emptyIndependent = emptyGraph.largestIndependentVertexSet()
         assertEquals(emptySet(), emptyIndependent)
 
-//        val vertexAmount = 100
-//        val bigGraph = GraphBuilder().apply {
-//            for (i in 0 until 100 step 10)
-//
-//        }
+        val bigGraph = GraphBuilder().apply {
+            var count = 780
+            val root = addVertex("r")
+            val queue = ArrayDeque<Graph.Vertex>()
+            queue.add(root)
+            while (queue.isNotEmpty() && count > 0) {
+                val vertex = queue.poll()
+                for (i in 0 until 5) {
+                    val child = addVertex(vertex.name + i)
+                    addConnection(vertex, child)
+                    queue.add(child)
+                    count--
+                }
+            }
+        }.build()
+        val bigSet = bigGraph.largestIndependentVertexSet()
+        assertEquals(651, bigSet.size)
 
 
         val graph = GraphBuilder().apply {
@@ -192,6 +205,26 @@ abstract class AbstractGraphTests {
     }
 
     fun longestSimplePath(longestSimplePath: Graph.() -> Path) {
+        // новые тесты
+        val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
+        val smallPath = smallGraph.longestSimplePath()
+        assertEquals(0, smallPath.length)
+
+        val vertexAmount = 200
+        val bigCompleteGraph = GraphBuilder().apply {
+            val vertices = Array<Graph.Vertex?>(vertexAmount) { null }
+            for (i in 0 until vertexAmount) {
+                vertices[i] = addVertex(i.toString())
+            }
+            for (i in 0 until vertices.size) {
+                for (j in i + 1 until vertices.size)
+                    addConnection(vertices[i]!!, vertices[j]!!)
+            }
+        }.build()
+        val bigPath = bigCompleteGraph.longestSimplePath()
+        assertEquals(vertexAmount - 1, bigPath.length)
+
+
         val graph = GraphBuilder().apply {
             val a = addVertex("A")
             val b = addVertex("B")
