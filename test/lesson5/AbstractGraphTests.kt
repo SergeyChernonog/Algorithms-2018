@@ -148,6 +148,30 @@ abstract class AbstractGraphTests {
         assertEquals(10, tree2.findBridges().size)
     }
 
+    fun makeBigTree() {
+        var vertAmount = 100
+        var withRoot = true
+        var setWithRootSize = 1
+        var setWithoutRootSize = 0
+        val random = Random()
+        val tree = GraphBuilder().apply {
+            val queue = ArrayDeque<Graph.Vertex>()
+            queue.add(addVertex("root"))
+            vertAmount--
+            while (queue.isNotEmpty() && vertAmount != 0) {
+                val current = queue.poll()
+                val numberOfChildren = random.nextInt(vertAmount)
+                vertAmount -= numberOfChildren
+                for (i in 1..numberOfChildren) {
+                    val child = addVertex(current.name + i)
+                    addConnection(current, child)
+                    queue.add(child)
+                }
+            }
+        }.build()
+        val setSize = if (setWithRootSize > setWithoutRootSize) setWithRootSize else setWithoutRootSize
+    }
+
 
     fun largestIndependentVertexSet(largestIndependentVertexSet: Graph.() -> Set<Graph.Vertex>) {
         // новые тесты
@@ -205,6 +229,7 @@ abstract class AbstractGraphTests {
     }
 
     fun longestSimplePath(longestSimplePath: Graph.() -> Path) {
+
         // новые тесты
         val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
         val smallPath = smallGraph.longestSimplePath()

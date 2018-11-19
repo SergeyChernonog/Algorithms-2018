@@ -18,8 +18,8 @@ import java.lang.StringBuilder
  */
 
 /**
- * Алгоритм проходит по всем буквам каждого слова- сложность O(M*N), для хранения информации используется матрица
- * размера O(M*N)
+ * Алгоритм проходит по всем буквам каждого слова- сложность O(M*N), где M и N - длины слов.
+ * Для хранения информации используется матрица размера O(M*N)
  */
 
 fun longestCommonSubSequence(first: String, second: String): String {
@@ -97,6 +97,7 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
  * Алгоритм проходит по каждой ячейке - сложность O(M*N), где M*N - колличество клеток
  * Для хранения поля и подсчета пути используется матрица размера O(M*N)
  */
+
 fun shortestPathOnField(inputName: String): Int {
     val fieldMatrix = mutableListOf<MutableList<Int>>()
     File(inputName).forEachLine { line -> fieldMatrix.add(line.split(" ").map { it.toInt() }.toMutableList()) }
