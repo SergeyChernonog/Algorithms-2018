@@ -71,17 +71,6 @@ abstract class AbstractGraphTests {
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {
 
         //новые тесты
-        val disconnectedGraph = GraphBuilder().apply {
-            val a = addVertex("A")
-            val b = addVertex("B")
-            val c = addVertex("C")
-            val d = addVertex("D")
-            addConnection(a, b)
-            addConnection(c, d)
-        }.build()
-        val treeOfDisconnected = disconnectedGraph.minimumSpanningTree()
-        assertEquals(0, treeOfDisconnected.edges.size)
-
         val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
         val smallTree = smallGraph.minimumSpanningTree()
         assertEquals(0, smallTree.edges.size)
@@ -95,10 +84,9 @@ abstract class AbstractGraphTests {
             val vertices = Array<Graph.Vertex?>(vertexAmount) { null }
             for (i in 0 until vertexAmount) {
                 vertices[i] = addVertex(i.toString())
-            }
-            for (i in 0 until vertices.size) {
-                for (j in i + 1 until vertices.size)
+                for (j in 0 until i) {
                     addConnection(vertices[i]!!, vertices[j]!!)
+                }
             }
         }.build()
         val bigTree = bigCompleteGraph.minimumSpanningTree()
@@ -148,31 +136,6 @@ abstract class AbstractGraphTests {
         assertEquals(10, tree2.findBridges().size)
     }
 
-    fun makeBigTree() {
-        var vertAmount = 100
-        var withRoot = true
-        var setWithRootSize = 1
-        var setWithoutRootSize = 0
-        val random = Random()
-        val tree = GraphBuilder().apply {
-            val queue = ArrayDeque<Graph.Vertex>()
-            queue.add(addVertex("root"))
-            vertAmount--
-            while (queue.isNotEmpty() && vertAmount != 0) {
-                val current = queue.poll()
-                val numberOfChildren = random.nextInt(vertAmount)
-                vertAmount -= numberOfChildren
-                for (i in 1..numberOfChildren) {
-                    val child = addVertex(current.name + i)
-                    addConnection(current, child)
-                    queue.add(child)
-                }
-            }
-        }.build()
-        val setSize = if (setWithRootSize > setWithoutRootSize) setWithRootSize else setWithoutRootSize
-    }
-
-
     fun largestIndependentVertexSet(largestIndependentVertexSet: Graph.() -> Set<Graph.Vertex>) {
         // новые тесты
         val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
@@ -182,25 +145,6 @@ abstract class AbstractGraphTests {
         val emptyGraph = GraphBuilder().build()
         val emptyIndependent = emptyGraph.largestIndependentVertexSet()
         assertEquals(emptySet(), emptyIndependent)
-
-        val bigGraph = GraphBuilder().apply {
-            var count = 780
-            val root = addVertex("r")
-            val queue = ArrayDeque<Graph.Vertex>()
-            queue.add(root)
-            while (queue.isNotEmpty() && count > 0) {
-                val vertex = queue.poll()
-                for (i in 0 until 5) {
-                    val child = addVertex(vertex.name + i)
-                    addConnection(vertex, child)
-                    queue.add(child)
-                    count--
-                }
-            }
-        }.build()
-        val bigSet = bigGraph.largestIndependentVertexSet()
-        assertEquals(651, bigSet.size)
-
 
         val graph = GraphBuilder().apply {
             val a = addVertex("A")
@@ -231,7 +175,9 @@ abstract class AbstractGraphTests {
     fun longestSimplePath(longestSimplePath: Graph.() -> Path) {
 
         // новые тесты
-        val smallGraph = GraphBuilder().apply { addVertex("A") }.build()
+        val smallGraph = GraphBuilder().apply {
+            addVertex("A")
+        }.build()
         val smallPath = smallGraph.longestSimplePath()
         assertEquals(0, smallPath.length)
 
@@ -240,12 +186,12 @@ abstract class AbstractGraphTests {
             val vertices = Array<Graph.Vertex?>(vertexAmount) { null }
             for (i in 0 until vertexAmount) {
                 vertices[i] = addVertex(i.toString())
-            }
-            for (i in 0 until vertices.size) {
-                for (j in i + 1 until vertices.size)
+                for (j in 0 until i) {
                     addConnection(vertices[i]!!, vertices[j]!!)
+                }
             }
         }.build()
+
         val bigPath = bigCompleteGraph.longestSimplePath()
         assertEquals(vertexAmount - 1, bigPath.length)
 

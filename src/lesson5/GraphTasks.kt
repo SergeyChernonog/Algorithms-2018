@@ -90,7 +90,7 @@ fun Graph.haveCycle(): Boolean {
     while (queue.isNotEmpty()) {
         val (current, prev) = queue.poll()
         if (current in visited) return true
-        this.getNeighbors(current).forEach { if (it != prev) queue.add(Pair(it, current)) }
+        this.getNeighbors(current).forEach { if (it != prev) queue.add(it to current) }
         visited.add(current)
     }
     return false

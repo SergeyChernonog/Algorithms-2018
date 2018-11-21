@@ -18,7 +18,8 @@ import java.lang.StringBuilder
  */
 
 /**
- * Алгоритм проходит по всем буквам каждого слова- сложность O(M*N), где M и N - длины слов.
+ * Алгоритм проходит по всем буквам каждого слова при составлении матрицы и восстановлении подстроки - сложность O(M*N),
+ * где M и N - длины слов.
  * Для хранения информации используется матрица размера O(M*N)
  */
 
@@ -101,6 +102,7 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
 fun shortestPathOnField(inputName: String): Int {
     val fieldMatrix = mutableListOf<MutableList<Int>>()
     File(inputName).forEachLine { line -> fieldMatrix.add(line.split(" ").map { it.toInt() }.toMutableList()) }
+
 
     for (i in 0 until fieldMatrix.size) {
         for (j in 0 until fieldMatrix.first().size) {
