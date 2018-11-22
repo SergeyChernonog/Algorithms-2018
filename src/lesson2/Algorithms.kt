@@ -5,7 +5,6 @@ package lesson2
 import lesson3.Trie
 import java.io.File
 import java.lang.IllegalArgumentException
-import java.util.*
 
 
 /**
